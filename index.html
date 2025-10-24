@@ -1,419 +1,685 @@
 <!doctype html>
 <html lang="en">
+
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Jutechs — Professional Certificate Generator</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Professional Certificate Generator — Full Stack Developer</title>
 
-  <!-- External libs (CDN) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNa5Qf0tq8QRyqZ0s9p3rJv2QnPO8gWl6e6kz1kgmB6tq6H3x1h2f3e2v/2x8g7QH9xQ2f4ZQn4y5Rx3x5Qf0g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-5l2yV3bY4bZs9cK0yW3oA6gN7c5vZj8w3d6mX3m9kZl8k2A7R1fE3Y4bH2t1p3yQ9h4Vg7Y2z3Jm1w2Qm7Q2A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Roboto:wght@400;500;700&display=swap"
+        rel="stylesheet">
 
-  <style>
-    :root{
-      --bg:#f3f7fb; --card:#ffffff; --accent:#0a63b7; --muted:#556;
-      --paper:#fdfdfd;
-    }
-    body{ font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; margin:0; padding:20px; background:linear-gradient(180deg,#f7fbff,var(--bg)); color:#0b2540; }
-    .container{ max-width:1100px; margin:0 auto; display:grid; grid-template-columns: 420px 1fr; gap:20px; align-items:start; }
-    h1{ margin:0 0 8px 0; font-size:20px; color:var(--accent); }
-    .card{ background:var(--card); border-radius:12px; padding:16px; box-shadow:0 8px 30px rgba(10,40,80,0.06); border:1px solid rgba(10,40,80,0.04); }
-    label{ font-size:13px; color:var(--muted); display:block; margin-bottom:6px; }
-    input[type="text"], input[type="date"], select, textarea{ width:100%; padding:10px 12px; border-radius:8px; border:1px solid #e6eefc; background:#fbfdff; font-size:14px; box-sizing:border-box; }
-    .row{ display:flex; gap:10px; }
-    .small{ font-size:12px; color:#556; }
-    .btn{ background:var(--accent); color:white; padding:10px 14px; border-radius:8px; border:0; cursor:pointer; font-weight:700; }
-    .btn.secondary{ background:transparent; color:var(--accent); border:1px solid #cfe3ff; font-weight:700; }
-    .controls{ display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
-    .logo-preview{ width:120px; height:80px; object-fit:contain; background:linear-gradient(180deg,#fff,#f6faff); border-radius:6px; padding:6px; display:block; border:1px solid #eef6ff; }
-    .signature-pad{ border:1px dashed #dbefff; border-radius:8px; background:#fff; width:100%; height:120px; touch-action: none; }
-    .muted{ color:var(--muted); font-size:13px; }
-    /* Certificate preview styles */
-    .preview-wrap{ padding:24px; display:flex; justify-content:center; }
-    .certificate{
-      width:842px; /* A4 at 96dpi approx for preview */
-      height:595px;
-      background: linear-gradient(180deg,#ffffff,#fcfdff);
-      border:8px solid #f1f7ff;
-      box-shadow: 0 10px 35px rgba(6,24,60,0.08);
-      position:relative;
-      padding:36px 48px;
-      box-sizing:border-box;
-      font-family: "Times New Roman", serif;
-    }
-    .cert-header{ display:flex; align-items:center; gap:18px; }
-    .cert-logo{ width:120px; height:90px; object-fit:contain; border-radius:8px; background:#fff; padding:6px; border:1px solid #eef6ff; }
-    .cert-title{ flex:1; text-align:center; }
-    .cert-title h2{ margin:0; font-size:28px; color:var(--accent); letter-spacing:1px; }
-    .cert-title p{ margin:4px 0 0 0; color:#213b5a; font-weight:600; font-size:14px; }
-    .cert-body{ margin-top:26px; text-align:center; }
-    .recipient{ font-size:28px; font-weight:800; margin-top:12px; }
-    .desc{ margin-top:12px; font-size:15px; color:#234; max-width:80%; margin-left:auto; margin-right:auto; line-height:1.4; }
-    .meta-line{ margin-top:26px; display:flex; justify-content:space-between; align-items:center; padding:0 24px; }
-    .meta-left{ text-align:left; font-size:13px; color:#234; }
-    .meta-right{ text-align:right; font-size:13px; color:#234; }
-    .signature-block{ margin-top:18px; display:flex; justify-content:space-between; align-items:flex-end; padding:0 24px; }
-    .sign-box{ text-align:center; width:45%; }
-    .sign-img{ max-width:220px; max-height:80px; display:block; margin:0 auto; }
-    .cert-serial{ font-size:11px; color:#556; text-align:center; margin-top:8px; }
-    .controls-compact{ display:flex; gap:6px; margin-top:10px; }
-    .note{ font-size:12px; color:#456; margin-top:8px; }
-    @media (max-width:980px){
-      .container{ grid-template-columns:1fr; }
-      .certificate{ width:100%; height:auto; transform:scale(0.85); transform-origin:top center; }
-    }
-  </style>
+    <style>
+        :root {
+            --bg: #f2f6fb;
+            --card: #ffffff;
+            --accent: #0a63b7;
+            --muted: #556;
+            --gold: #c79a2d;
+            --border: #e6eefc;
+        }
+
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            font-family: "Roboto", system-ui, Segoe UI, Roboto, Helvetica, Arial;
+            background: linear-gradient(180deg, #eef6ff 0%, var(--bg) 100%);
+            color: #0b2140;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 28px auto;
+            padding: 18px;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            margin-bottom: 16px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-family: "Playfair Display", serif;
+            font-size: 20px;
+        }
+
+        header p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 420px 1fr;
+            gap: 18px;
+            align-items: start;
+        }
+
+        .panel {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 6px 20px rgba(10, 60, 120, 0.04);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid #dde9fb;
+            font-size: 14px;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .small {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            align-items: center;
+        }
+
+        button {
+            background: var(--accent);
+            color: white;
+            border: 0;
+            padding: 10px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        button.ghost {
+            background: transparent;
+            color: var(--accent);
+            border: 1px solid var(--border);
+            font-weight: 700;
+        }
+
+        input[type="file"] {
+            font-size: 13px;
+        }
+
+        /* certificate preview area */
+        .preview-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .cert-canvas {
+            width: 100%;
+            background: linear-gradient(180deg, #ffffff 0%, #fbfbff 100%);
+            border-radius: 8px;
+            padding: 28px;
+            box-sizing: border-box;
+            border: 1px solid #e9eef8;
+        }
+
+        /* We style the certificate as an A4-like card scaled to fit container; when printing/pdf we render it to real A4 via html2pdf options. */
+        .certificate {
+            width: 210mm;
+            /* A4 width for layout reference */
+            height: 297mm;
+            /* A4 height */
+            box-sizing: border-box;
+            padding: 36mm 22mm;
+            /* generous padding for certificate look */
+            background: linear-gradient(180deg, #fff 0%, #fcfdff 100%);
+            border: 6px solid #fff;
+            position: relative;
+            font-family: "Roboto", sans-serif;
+            color: #07243e;
+        }
+
+        .cert-inner {
+            height: 100%;
+            border: 6px solid rgba(10, 60, 120, 0.04);
+            padding: 28px;
+            box-sizing: border-box;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        .issuer {
+            display: flex;
+            width: 100%;
+            align-items: center;
+            gap: 12px;
+            justify-content: space-between;
+        }
+
+        .issuer .brand {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .brand .logo {
+            width: 64px;
+            height: 64px;
+            border-radius: 12px;
+            background: linear-gradient(90deg, #e6f2ff, #ffffff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--accent);
+            box-shadow: 0 6px 14px rgba(6, 70, 140, 0.06);
+        }
+
+        .brand .title {
+            font-family: "Playfair Display", serif;
+            font-size: 20px;
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .cert-title {
+            margin-top: 18px;
+            font-family: "Playfair Display", serif;
+            font-size: 28px;
+            letter-spacing: 0.6px;
+            color: #08306a;
+        }
+
+        .cert-sub {
+            margin-top: 6px;
+            color: var(--muted);
+            font-size: 14px;
+            text-align: center;
+            max-width: 75%;
+        }
+
+        .recipient {
+            margin-top: 24px;
+            text-align: center;
+        }
+
+        .recipient .name {
+            font-size: 26px;
+            font-weight: 800;
+            color: #05243f;
+            margin-bottom: 6px;
+            font-family: "Playfair Display", serif;
+        }
+
+        .recipient .desc {
+            font-size: 14px;
+            color: var(--muted);
+            max-width: 80%;
+            margin: 0 auto;
+        }
+
+        .meta-row {
+            margin-top: 24px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .meta-box {
+            text-align: left;
+        }
+
+        .meta-box .label {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .meta-box .value {
+            font-weight: 700;
+            color: #05345a;
+            font-size: 14px;
+            margin-top: 6px;
+        }
+
+        .sig-row {
+            margin-top: 32px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sig-left {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .signature {
+            height: 64px;
+            width: 220px;
+            background: transparent;
+            object-fit: contain;
+            border-bottom: 1px solid rgba(7, 36, 64, 0.06);
+        }
+
+        .issuer-info {
+            text-align: right;
+        }
+
+        .cert-footer {
+            position: absolute;
+            bottom: 28mm;
+            left: 22mm;
+            right: 22mm;
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--muted);
+            align-items: center;
+            opacity: 0.95;
+        }
+
+        .seal {
+            width: 84px;
+            height: 84px;
+            border-radius: 999px;
+            background: linear-gradient(180deg, #fff 0%, #f5f9ff 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid rgba(10, 60, 120, 0.06);
+            font-weight: 800;
+            color: var(--gold);
+            box-shadow: 0 8px 20px rgba(10, 60, 120, 0.04);
+        }
+
+        /* responsive preview scaling */
+        .preview-frame {
+            width: 100%;
+            overflow: auto;
+            display: flex;
+            justify-content: center;
+            padding: 12px;
+            background: linear-gradient(180deg, #f8fbff 0%, #fff 100%);
+            border-radius: 6px;
+            border: 1px dashed rgba(10, 60, 120, 0.03);
+        }
+
+        .scale-wrap {
+            transform-origin: top left;
+        }
+
+        @media (max-width:980px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            .certificate {
+                padding: 28px;
+            }
+        }
+    </style>
 </head>
+
 <body>
-  <div class="container">
-    <!-- Left: form -->
-    <div class="card">
-      <h1>Jutechs — Certificate Generator</h1>
-      <p class="muted">Fill the fields below. Upload a logo or place a file named <code>jutechs.jpg</code> next to this HTML file. Draw or upload a signature. Click <strong>Generate PDF</strong> to download an A4 certificate.</p>
-
-      <div style="margin-top:12px;">
-        <label>Recipient Full Name</label>
-        <input id="fullName" type="text" placeholder="e.g., Linah Tipira" />
-
-        <label style="margin-top:10px;">ID / Registration Number</label>
-        <input id="idNumber" type="text" placeholder="e.g., 12345678" />
-
-        <label style="margin-top:10px;">Course / Title</label>
-        <input id="course" type="text" placeholder="e.g., Full-Stack Web Development" />
-
-        <div class="row" style="margin-top:10px;">
-          <div style="flex:1;">
-            <label>Date of Issue</label>
-            <input id="issueDate" type="date" />
-          </div>
-          <div style="width:170px;">
-            <label>Grade / Remark</label>
-            <input id="grade" type="text" placeholder="e.g., Distinction" />
-          </div>
-        </div>
-
-        <label style="margin-top:10px;">Issuer (Organization)</label>
-        <input id="issuer" type="text" placeholder="Jutechs" value="Jutechs" />
-
-        <label style="margin-top:10px;">Certificate ID (auto or edit)</label>
-        <input id="certId" type="text" />
-
-        <hr style="margin:14px 0;" />
-
-        <label>Upload Logo (optional — PNG/JPG)</label>
-        <input id="logoInput" type="file" accept="image/*" />
-
-        <div style="display:flex; gap:10px; align-items:center; margin-top:8px;">
-          <img id="logoPreview" class="logo-preview" src="" alt="logo preview" onerror="this.style.display='none'"/>
-          <div>
-            <div class="small">If you don't upload, the app will try to load <code>jutechs.jpg</code> from this folder.</div>
-            <div class="note">Recommended: transparent PNG or 400×400 px.</div>
-          </div>
-        </div>
-
-        <hr style="margin:14px 0;" />
-
-        <label>Signature (draw)</label>
-        <canvas id="sigCanvas" class="signature-pad"></canvas>
-        <div class="controls-compact">
-          <button id="clearSig" class="btn secondary">Clear</button>
-          <button id="saveSig" class="btn secondary">Use as Signature</button>
-          <div class="small" style="align-self:center;">or upload an image:</div>
-          <input id="sigUpload" type="file" accept="image/*" />
-        </div>
-
-        <div class="controls" style="margin-top:14px;">
-          <button id="generatePdf" class="btn">Generate PDF</button>
-          <button id="previewBtn" class="btn secondary">Refresh Preview</button>
-          <button id="downloadPng" class="btn secondary">Download Certificate PNG</button>
-        </div>
-
-        <div class="note" style="margin-top:10px;">PDF is generated client-side and will download directly to your device storage (check browser Downloads folder or prompt depending on device).</div>
-      </div>
-    </div>
-
-    <!-- Right: preview -->
-    <div class="card">
-      <h1 style="font-size:16px;margin-bottom:8px;">Preview — A4 Certificate</h1>
-      <div class="preview-wrap" id="previewWrap">
-        <div class="certificate" id="certificate">
-          <div class="cert-header">
-            <img id="certLogo" class="cert-logo" src="" alt="logo" />
-            <div class="cert-title">
-              <h2>Certificate of Completion</h2>
-              <p>Presented by <strong id="issuerPreview">Jutechs</strong></p>
+    <div class="container">
+        <header>
+            <div>
+                <h1>Professional Certificate Generator — Full Stack Developer</h1>
+                <p>Fill in your details below and generate a downloadable, print-ready PDF certificate (A4).</p>
             </div>
-            <div style="width:120px"></div>
-          </div>
+        </header>
 
-          <div class="cert-body">
-            <div style="font-size:14px;color:#334; margin-top:6px;">This is to certify that</div>
-            <div id="recipientPreview" class="recipient">[Recipient Name]</div>
-            <div class="desc" id="descPreview">has successfully completed the requirements of the course and demonstrated competency in the subject matter for the course mentioned below.</div>
+        <div class="layout">
+            <!-- left: form -->
+            <div class="panel">
+                <h3 style="margin-top:0">Enter Certificate Details</h3>
 
-            <div style="margin-top:18px;font-weight:700;color:#234;">Course / Title</div>
-            <div style="font-weight:600;font-size:15px;margin-top:6px;" id="coursePreview">[Course]</div>
-
-            <div class="meta-line">
-              <div class="meta-left">
-                <div><strong>ID:</strong> <span id="idPreview">—</span></div>
-                <div style="margin-top:6px;"><strong>Date:</strong> <span id="datePreview">—</span></div>
-              </div>
-              <div class="meta-right">
-                <div><strong>Grade:</strong> <span id="gradePreview">—</span></div>
-                <div style="margin-top:6px;"><strong>Certificate No:</strong> <span id="certIdPreview">—</span></div>
-              </div>
-            </div>
-
-            <div class="signature-block">
-              <div class="sign-box">
-                <div style="height:90px; display:flex; align-items:center; justify-content:center;">
-                  <img id="sigPreview" class="sign-img" src="" alt="signature" style="display:none" />
+                <div style="margin-bottom:8px">
+                    <label class="small">Recipient Full Name</label>
+                    <input id="fullname" type="text" placeholder="e.g., Linah Tipira" />
                 </div>
-                <div style="margin-top:6px; font-size:13px; color:#243;">Signature</div>
-              </div>
 
-              <div style="width:200px; text-align:center;">
-                <div style="font-size:13px;color:#556;">Authorized by</div>
-                <div style="font-weight:700; margin-top:6px;" id="issuerSign">Jutechs</div>
-                <div class="cert-serial" id="issuedSerial">Serial: —</div>
-              </div>
+                <div class="form-row">
+                    <div style="flex:1">
+                        <label class="small">Course / Title</label>
+                        <input id="course" type="text" placeholder="Full Stack Developer Program" />
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div style="flex:1">
+                        <label class="small">Certificate ID (optional)</label>
+                        <input id="certId" type="text" placeholder="e.g., JUTEC/FS/2025/001" />
+                    </div>
+                    <div style="width:140px">
+                        <label class="small">Date</label>
+                        <input id="certDate" type="date" />
+                    </div>
+                </div>
+
+                <div style="margin-bottom:8px">
+                    <label class="small">Issuer (Organization)</label>
+                    <input id="issuer" type="text" placeholder="e.g., Jutechs Institute" value="Jutechs" />
+                </div>
+
+                <div style="margin-bottom:8px">
+                    <label class="small">Optional Note / Honors</label>
+                    <input id="note" type="text" placeholder="e.g., Completed with Distinction (optional)" />
+                </div>
+
+                <div style="margin-bottom:6px">
+                    <label class="small">Upload Signature (optional)</label>
+                    <input id="sigUpload" type="file" accept="image/*" />
+                    <div class="small" style="margin-top:6px">PNG with transparent background recommended. Max 2MB.
+                    </div>
+                </div>
+
+                <div style="margin-top:12px">
+                    <label class="small">Logo text (appears on certificate)</label>
+                    <input id="logoText" type="text" placeholder="Jutechs" value="Jutechs" />
+                </div>
+
+                <div class="btn-row">
+                    <button id="updateBtn">Update Preview</button>
+                    <button id="downloadBtn">Generate & Download PDF</button>
+                    <button class="ghost" id="resetBtn">Reset</button>
+                </div>
+
+                <div style="margin-top:12px" class="small">
+                    <strong>Notes:</strong> The PDF will be high-resolution A4. When downloaded on mobile, the file goes
+                    to device storage (Downloads folder). No data is sent to any server — generation happens in your
+                    browser.
+                </div>
             </div>
 
-          </div>
+            <!-- right: preview & actions -->
+            <div class="panel preview-wrap">
+                <h3 style="margin:0">Certificate Preview</h3>
+                <div class="cert-canvas" id="previewArea">
+                    <div class="preview-frame">
+                        <div id="scaleWrap" class="scale-wrap">
+                            <!-- This certificate element will be converted to PDF -->
+                            <div id="certificate" class="certificate" role="document" aria-label="Certificate">
+                                <div class="cert-inner">
+                                    <div class="issuer">
+                                        <div class="brand">
+                                            <div class="logo" id="logoBox">JT</div>
+                                            <div>
+                                                <div class="title" id="issuerText">Jutechs</div>
+                                                <div class="small" id="issuerTagline">Institute of Technology</div>
+                                            </div>
+                                        </div>
+                                        <div class="seal" id="sealText">CERT</div>
+                                    </div>
+
+                                    <div class="cert-title">Certificate of Completion</div>
+                                    <div class="cert-sub" id="certSubtitle">This certifies that the person named below
+                                        has successfully completed the program</div>
+
+                                    <div class="recipient">
+                                        <div class="name" id="recipientName">Full Name Here</div>
+                                        <div class="desc" id="recipientDesc">has completed the Full Stack Developer
+                                            program with demonstrated proficiency in front-end, back-end and deployment
+                                            fundamentals.</div>
+                                    </div>
+
+                                    <div class="meta-row">
+                                        <div class="meta-box">
+                                            <div class="label">Certificate ID</div>
+                                            <div class="value" id="metaId">JUTEC-FS-2025-000</div>
+                                        </div>
+
+                                        <div class="meta-box" style="text-align:center;">
+                                            <div class="label">Date</div>
+                                            <div class="value" id="metaDate">October 24, 2025</div>
+                                        </div>
+
+                                        <div class="meta-box issuer-info" style="text-align:right;">
+                                            <div class="label">Issuer</div>
+                                            <div class="value" id="metaIssuer">Jutechs</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="sig-row">
+                                        <div class="sig-left">
+                                            <img id="sigImage" class="signature" alt="Signature" src="" style="display:none" />
+                                            <div class="small" style="color:var(--muted)">Authorized Signature</div>
+                                        </div>
+                                        <div style="text-align:right;">
+                                            <div class="small" style="margin-bottom:8px">Awarded for:</div>
+                                            <div style="font-weight:700; color:#062a4a" id="metaCourse">Full Stack
+                                                Developer</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="cert-footer">
+                                        <div class="small">Verify at
+                                            <span id="verifyUrl" style="color:var(--accent); font-weight:700">jutechs.wauze.co</span>
+                                        </div>
+                                        <div class="small">Powered by Jutechs • © <span id="yearText"></span></div>
+                                    </div>
+
+                                </div><!-- cert-inner -->
+                            </div><!-- certificate -->
+                        </div><!-- scale-wrap -->
+                    </div><!-- preview-frame -->
+                </div><!-- cert-canvas -->
+
+            </div>
         </div>
-      </div>
+
     </div>
-  </div>
 
-  <script>
-    /*************************************************************************
-     * Certificate Generator - Single file frontend app
-     * - Uses html2canvas + jsPDF to export a high-resolution A4 PDF
-     * - SignaturePad for drawing signatures
-     * - Logo upload fallback to 'jutechs.jpg' in same directory
-     *
-     * How it works:
-     * 1. User fills fields and provides logo/signature.
-     * 2. Preview updates in real-time or via "Refresh Preview".
-     * 3. Generate PDF: html2canvas renders the preview at high scale, jsPDF
-     *    creates an A4-sized PDF and downloads it to device storage.
-     *************************************************************************/
+    <!-- html2pdf bundle (includes html2canvas + jsPDF) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
 
-    // Short helpers for DOM
-    const $, $$;
-    const el = id => document.getElementById(id);
-    const fullName = el('fullName'), idNumber = el('idNumber'), course = el('course'),
-          issueDate = el('issueDate'), grade = el('grade'), issuer = el('issuer'),
-          certId = el('certId'), logoInput = el('logoInput'), logoPreview = el('logoPreview'),
-          certLogo = el('certLogo'), recipientPreview = el('recipientPreview'),
-          issuerPreview = el('issuerPreview'), coursePreview = el('coursePreview'),
-          datePreview = el('datePreview'), gradePreview = el('gradePreview'),
-          idPreview = el('idPreview'), certIdPreview = el('certIdPreview'),
-          sigCanvas = el('sigCanvas'), clearSig = el('clearSig'), saveSig = el('saveSig'),
-          sigUpload = el('sigUpload'), sigPreview = el('sigPreview'),
-          previewBtn = el('previewBtn'), generatePdf = el('generatePdf'),
-          downloadPng = el('downloadPng'), issuedSerial = el('issuedSerial'),
-          cert = el('certificate'), certDesc = el('descPreview'), issuerSign = el('issuerSign');
+    <script>
+        // Elements
+    const fullname = document.getElementById('fullname');
+    const course = document.getElementById('course');
+    const certId = document.getElementById('certId');
+    const certDate = document.getElementById('certDate');
+    const issuer = document.getElementById('issuer');
+    const note = document.getElementById('note');
+    const sigUpload = document.getElementById('sigUpload');
+    const logoText = document.getElementById('logoText');
 
-    // SignaturePad setup
-    const signaturePad = new SignaturePad(sigCanvas, { backgroundColor: 'rgba(255,255,255,0)', penColor: 'rgb(15,45,90)', minWidth:1, maxWidth:2.5 });
+    const updateBtn = document.getElementById('updateBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const resetBtn = document.getElementById('resetBtn');
 
-    // Make canvas fit container
-    function resizeSigCanvas(){
-      const ratio = Math.max(window.devicePixelRatio || 1, 1);
-      const w = sigCanvas.clientWidth;
-      const h = sigCanvas.clientHeight;
-      sigCanvas.width = Math.floor(w * ratio);
-      sigCanvas.height = Math.floor(h * ratio);
-      sigCanvas.getContext('2d').scale(ratio, ratio);
-      signaturePad.clear(); // keep cleared after resize to avoid stretching previous stroke
+    // Preview elements
+    const recipientName = document.getElementById('recipientName');
+    const recipientDesc = document.getElementById('recipientDesc');
+    const metaId = document.getElementById('metaId');
+    const metaDate = document.getElementById('metaDate');
+    const metaIssuer = document.getElementById('metaIssuer');
+    const metaCourse = document.getElementById('metaCourse');
+    const sigImage = document.getElementById('sigImage');
+    const logoBox = document.getElementById('logoBox');
+    const issuerText = document.getElementById('issuerText');
+    const yearText = document.getElementById('yearText');
+    const certSubtitle = document.getElementById('certSubtitle');
+    const verifyUrl = document.getElementById('verifyUrl');
+    const certificateEl = document.getElementById('certificate');
+
+    // Default values
+    function setDefaults(){
+      if(!fullname.value) fullname.value = '';
+      if(!course.value) course.value = 'Full Stack Developer Program';
+      if(!issuer.value) issuer.value = 'Jutechs';
+      if(!logoText.value) logoText.value = 'Jutechs';
+      if(!certId.value) certId.value = 'JUTEC-FS-2025-001';
+      if(!certDate.value){
+        // set today's date in YYYY-MM-DD format
+        const d = new Date();
+        const iso = new Date(d.getTime() - d.getTimezoneOffset()*60000).toISOString().slice(0,10);
+        certDate.value = iso;
+      }
+      yearText.textContent = new Date().getFullYear();
+      verifyUrl.textContent = location.hostname || 'jutechs.wauze.co';
     }
-    // Initial resize
-    window.addEventListener('resize', resizeSigCanvas);
-    resizeSigCanvas();
+    setDefaults();
 
-    // Auto-generate certificate ID if empty
-    function generateSerial(){
-      const d = new Date();
-      const y = d.getFullYear().toString().slice(-2);
-      const rand = Math.floor(100000 + Math.random() * 900000); // six-digit
-      return `JUT-${y}-${rand}`;
+    // Helper: format date nicely
+    function formatDate(iso){
+      if(!iso) return '';
+      const d = new Date(iso);
+      const opts = { year: 'numeric', month: 'long', day: 'numeric' };
+      return d.toLocaleDateString(undefined, opts);
     }
-    if(!certId.value) certId.value = generateSerial();
 
-    // Try to pre-load jutechs.jpg from same folder (if user kept it there)
-    (function tryLoadLocalLogo(){
-      const img = new Image();
-      img.onload = () => {
-        certLogo.src = 'jutechs.jpg';
-        logoPreview.src = 'jutechs.jpg';
-        logoPreview.style.display = '';
+    // Update preview content from form fields
+    function updatePreview(){
+      recipientName.textContent = fullname.value.trim() || 'Full Name Here';
+      const courseText = course.value.trim() || 'Full Stack Developer Program';
+      metaCourse.textContent = courseText;
+      recipientDesc.textContent = note.value.trim() || `has completed the ${courseText} with demonstrated proficiency in front-end, back-end and deployment fundamentals.`;
+      metaId.textContent = certId.value.trim() || '—';
+      metaDate.textContent = formatDate(certDate.value) || '—';
+      metaIssuer.textContent = issuer.value.trim() || '—';
+      issuerText.textContent = issuer.value.trim() || 'Jutechs';
+      logoBox.textContent = (logoText.value || '').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase() || 'JT';
+      certSubtitle.textContent = `This certifies that the person named below has successfully completed the program`;
+      verifyUrl.textContent = (location.hostname && location.hostname !== '') ? location.hostname : 'jutechs.wauze.co';
+    }
+
+    // Handle signature upload preview
+    sigUpload.addEventListener('change', (e) => {
+      const f = e.target.files && e.target.files[0];
+      if(!f) { sigImage.style.display='none'; sigImage.src=''; return; }
+      if(f.size > 2 * 1024 * 1024){ alert('Signature image is larger than 2MB. Please pick a smaller file.'); sigUpload.value=''; return; }
+      const reader = new FileReader();
+      reader.onload = function(ev){
+        sigImage.src = ev.target.result;
+        sigImage.style.display = 'block';
+      }
+      reader.readAsDataURL(f);
+    });
+
+    // Attach update button
+    updateBtn.addEventListener('click', (e) => {
+      updatePreview();
+      // scale preview to fit container by CSS transform
+      fitPreview();
+    });
+
+    resetBtn.addEventListener('click', () => {
+      if(!confirm('Reset all fields to defaults?')) return;
+      fullname.value=''; course.value='Full Stack Developer Program'; certId.value='JUTEC-FS-2025-001';
+      certDate.value=''; issuer.value='Jutechs'; note.value=''; sigUpload.value=''; logoText.value='Jutechs';
+      sigImage.src=''; sigImage.style.display='none';
+      setDefaults();
+      updatePreview();
+      fitPreview();
+    });
+
+    // Fit preview to container width (scale down for screen)
+    function fitPreview(){
+      // compute available width of preview frame
+      const parent = document.querySelector('.preview-frame');
+      const scaleWrap = document.getElementById('scaleWrap');
+      if(!parent || !scaleWrap) return;
+      const available = parent.clientWidth - 40; // some padding
+      const certWidthPx = 210 * (96/25.4); // approximate px width for 210mm at 96dpi: 210mm * (96/25.4)
+      const scale = Math.min(1, available / certWidthPx);
+      scaleWrap.style.transform = `scale(${scale})`;
+    }
+    window.addEventListener('resize', fitPreview);
+    // initial preview update
+    updatePreview();
+    fitPreview();
+
+    // PDF generation options using html2pdf
+    downloadBtn.addEventListener('click', async () => {
+      updatePreview(); // ensure latest values
+      // filename based on name and id
+      const namePart = (fullname.value.trim() || 'certificate').replace(/\s+/g,'_').replace(/[^a-zA-Z0-9_\-]/g,'');
+      const idPart = (certId.value.trim() || '').replace(/\s+/g,'_').replace(/[^a-zA-Z0-9_\-]/g,'');
+      const filename = idPart ? `${namePart}_${idPart}.pdf` : `${namePart}_certificate.pdf`;
+
+      // Prepare options for html2pdf to produce high-quality A4 PDF
+      const opt = {
+        margin:       [10, 10, 10, 10], // mm (top, left, bottom, right) when unit: 'mm' below
+        filename:     filename,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true, logging: false, allowTaint: true },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
       };
-      img.onerror = () => {
-        // hide preview if not found
-      };
-      img.src = 'jutechs.jpg';
-    })();
 
-    // Update preview function
-    function refreshPreview(){
-      // Assign values (with fallbacks)
-      const nameVal = fullName.value.trim() || '[Recipient Name]';
-      const idVal = idNumber.value.trim() || '—';
-      const courseVal = course.value.trim() || '[Course]';
-      const dateVal = issueDate.value ? new Date(issueDate.value).toLocaleDateString() : new Date().toLocaleDateString();
-      const gradeVal = grade.value.trim() || '—';
-      const issuerVal = issuer.value.trim() || 'Jutechs';
-      const certVal = certId.value.trim() || generateSerial();
+      // Show a quick feedback message
+      downloadBtn.disabled = true;
+      downloadBtn.textContent = 'Generating PDF...';
 
-      recipientPreview.textContent = nameVal;
-      idPreview.textContent = idVal;
-      coursePreview.textContent = courseVal;
-      datePreview.textContent = dateVal;
-      gradePreview.textContent = gradeVal;
-      issuerPreview.textContent = issuerVal;
-      issuerSign.textContent = issuerVal;
-      certIdPreview.textContent = certVal;
-      issuedSerial.textContent = 'Serial: ' + certVal;
-
-      // Description: small sentence
-      certDesc.textContent = `${nameVal} has successfully completed the ${courseVal} program and satisfied the required assessments for certification.`;
-
-      // Logo: if user uploaded an image, it's already set; otherwise if certLogo src empty and we previously found jutechs.jpg the src remains
-      // If no logo, hide image element
-      if(!certLogo.src || certLogo.src === window.location.href){
-        certLogo.style.display = 'none';
-      } else {
-        certLogo.style.display = '';
+      // Because the certificate element is styled for A4, ensure printing dimensions by temporarily adjusting styles
+      // Clone the certificate element to avoid layout changes on screen
+      const element = document.getElementById('certificate');
+      // Use html2pdf to convert the element
+      try {
+        await html2pdf().set(opt).from(element).save();
+      } catch (err) {
+        console.error('PDF generation error', err);
+        alert('An error occurred while generating the PDF. See console for details.');
+      } finally {
+        downloadBtn.disabled = false;
+        downloadBtn.textContent = 'Generate & Download PDF';
       }
+    });
 
-      // Signature: if user saved/uploaded signature, display it
-      if(sigPreview.src){
-        sigPreview.style.display = '';
-      } else {
-        sigPreview.style.display = 'none';
+    // Ensure preview is updated when user types (live update)
+    ['input','change'].forEach(evt => {
+      [fullname, course, certId, certDate, issuer, note, logoText].forEach(el => {
+        el.addEventListener(evt, () => {
+          updatePreview();
+        });
+      });
+    });
+
+    // initial auto-update for date etc
+    updatePreview();
+
+    // Accessibility: keyboard support for Enter on update
+    document.addEventListener('keydown', (e) => {
+      if(e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+        updatePreview();
       }
-    }
-
-    // Attach basic live handlers
-    [fullName, idNumber, course, issueDate, grade, issuer, certId].forEach(inp => {
-      inp.addEventListener('input', () => { refreshPreview(); });
     });
-
-    // Logo upload handling
-    logoInput.addEventListener('change', (ev) => {
-      const file = ev.target.files[0];
-      if(!file) return;
-      const url = URL.createObjectURL(file);
-      certLogo.src = url;
-      logoPreview.src = url;
-      logoPreview.style.display = '';
-      certLogo.style.display = '';
-      refreshPreview();
-    });
-
-    // Signature controls
-    clearSig.addEventListener('click', () => {
-      signaturePad.clear();
-      // also clear preview signature
-      sigPreview.src = '';
-      sigPreview.style.display = 'none';
-    });
-    saveSig.addEventListener('click', () => {
-      if(signaturePad.isEmpty()){
-        alert('Please draw your signature first (or upload a signature image).');
-        return;
-      }
-      const dataURL = signaturePad.toDataURL('image/png');
-      sigPreview.src = dataURL;
-      sigPreview.style.display = '';
-    });
-    sigUpload.addEventListener('change', (ev) => {
-      const f = ev.target.files[0];
-      if(!f) return;
-      const url = URL.createObjectURL(f);
-      sigPreview.src = url;
-      sigPreview.style.display = '';
-    });
-
-    // Preview button
-    previewBtn.addEventListener('click', () => {
-      // If canvas has strokes but not saved, save automatically
-      if(!sigPreview.src && !signaturePad.isEmpty()){
-        sigPreview.src = signaturePad.toDataURL('image/png');
-        sigPreview.style.display = '';
-      }
-      refreshPreview();
-      // Smooth scroll to preview
-      document.getElementById('previewWrap').scrollIntoView({behavior:'smooth'});
-    });
-
-    // Download PNG of the certificate (single image)
-    downloadPng.addEventListener('click', async () => {
-      await refreshPreview();
-      // Render certificate element to canvas
-      const scale = 2; // increase for higher res PNG
-      const canvas = await html2canvas(cert, { scale, useCORS:true, allowTaint:true, backgroundColor:null });
-      canvas.toBlob(blob => {
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = (fullName.value.trim() || 'certificate') + '.png';
-        a.click();
-        URL.revokeObjectURL(a.href);
-      }, 'image/png');
-    });
-
-    // Generate PDF
-    generatePdf.addEventListener('click', async () => {
-      // Ensure preview up to date and signature is saved
-      if(!sigPreview.src && !signaturePad.isEmpty()){
-        sigPreview.src = signaturePad.toDataURL('image/png');
-        sigPreview.style.display = '';
-      }
-      refreshPreview();
-
-      // Render at high DPI using html2canvas
-      const a4 = { widthPt:595.28, heightPt:841.89 }; // points at 72dpi (jsPDF default)
-      // We'll render at a pixel size relative to A4 at 2x scale to keep quality
-      const scale = 2.6; // adjust for higher quality; large values => larger image & PDF size
-      const canvas = await html2canvas(cert, { scale, useCORS:true, allowTaint:true, backgroundColor:'#ffffff' });
-
-      // Convert to image data
-      const imgData = canvas.toDataURL('image/png');
-
-      // Create jsPDF (portrait A4)
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF({ unit:'pt', format:'a4', compress:true });
-
-      // Calculate width/height to fit the A4 page while preserving aspect ratio
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-
-      // Canvas pixel size
-      const imgW = canvas.width;
-      const imgH = canvas.height;
-
-      // Convert pixel dims to PDF points at 72dpi: px * 72 / (devicePixelRatio*96) but simpler to compute scale factor
-      // We'll map canvas image to page width with maintained aspect ratio
-      const ratio = Math.min(pageWidth / imgW, pageHeight / imgH);
-      const renderW = imgW * ratio;
-      const renderH = imgH * ratio;
-      const marginX = (pageWidth - renderW) / 2;
-      const marginY = (pageHeight - renderH) / 2;
-
-      // Add image to PDF
-      pdf.addImage(imgData, 'PNG', marginX, marginY, renderW, renderH, undefined, 'FAST');
-
-      // Trigger download
-      const filename = `${(fullName.value.trim() || 'certificate')}_certificate.pdf`;
-      pdf.save(filename);
-    });
-
-    // Initial preview refresh
-    refreshPreview();
-
-  </script>
+    </script>
 </body>
+
 </html>
